@@ -12,7 +12,7 @@ def index(request):
      }
      return Response(courses)
 
-@api_view(['GET','POST','PUT','PATCH'])
+@api_view(['GET','POST','PUT','PATCH','DELETE'])
 def person(request):
     if request.method == 'GET':
         obj = Person.objects.all()
@@ -35,3 +35,14 @@ def person(request):
             return Response(serialized.data)
         else:
             return Response(serialized.errors)
+    elif request.method == 'DELETE':
+        data = request.data
+        try:
+            obj = Person.objects.get(id = data['id'])
+            obj.delete()
+            return Response({'message':'person deleted!'})
+        except:
+            return Response({'message':'person does not exist'})
+    
+            
+
