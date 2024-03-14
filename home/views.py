@@ -12,7 +12,7 @@ def index(request):
      }
      return Response(courses)
 
-@api_view(['GET','POST'])
+@api_view(['GET','POST','PUT','PATCH'])
 def person(request):
     if request.method == 'GET':
         obj = Person.objects.all()
@@ -26,4 +26,12 @@ def person(request):
             return Response(serialized.data)
         else:
             return Response(serialized.errors)
-     
+    elif request.method == 'PUT':
+        data = request.data
+        obj = Person.objects.get(id = data['id'])
+        serialized = PersonSerializer(obj,data=data)
+        if serialized.is_valid():
+            serialized.save()
+            return Response(serialized.data)
+        else:
+            return Response(serialized.errors)
