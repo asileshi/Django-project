@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import PersonSerializer
+from .serializers import PersonSerializer,LoginSerializer
 from .models import Person
 # Create your views here.
 @api_view(['GET'])
@@ -11,7 +11,15 @@ def index(request):
           'course_provider':'Scaler'
      }
      return Response(courses)
-
+@api_view(['POST','GET'])
+def login(request):
+    data = request.data
+    serilized = LoginSerializer(data=data)
+    if serilized.is_valid():
+        data = serilized.validated_data
+        return Response({'message':'success'})
+    
+    return Response(serilized.errors)
 @api_view(['GET','POST','PUT','PATCH','DELETE'])
 def person(request):
     if request.method == 'GET':
