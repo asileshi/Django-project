@@ -1,4 +1,5 @@
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import PersonSerializer,LoginSerializer
 from .models import Person
@@ -20,6 +21,50 @@ def login(request):
         return Response({'message':'success'})
     
     return Response(serilized.errors)
+
+class PersonApi(APIView):
+    def get(self,request):
+        obj = Person.objects.all()
+        serialized = PersonSerializer(obj,many = True)
+        return Response(serialized.data)
+    def post(self,request):
+        data = request.data
+        serialized = PersonSerializer(data = data)
+        if serialized.is_valid():
+            serialized.save()
+            return Response(serialized.data)
+        else:
+            return Response(serialized.errors)
+    def put(self,request):
+        data = request.data
+        obj = Person.objects.get(id = data['id'])
+        serialized = PersonSerializer(obj,data=data)
+        if serialized.is_valid():
+            serialized.save()
+            return Response(serialized.data)
+        else:
+            return Response(serialized.errors)
+    def patch(self,request):
+        data = request.data
+        obj = request.objects.get(id = data['id'])
+        serilized = PersonSerializer(obj,data=data,partial = True)
+        if serilized.is_valid():
+            return Response(serilized.data)
+        else:
+            return Response(serilized.errors)
+        
+    def delete(self,request):
+        data = request.data
+        try:
+            obj = Person.objects.get(id = data['id'])
+            obj.delete()
+            return Response({'message':'person deleted!'})
+        except:
+            return Response({'message':'person does not exist'})
+    
+            
+
+
 @api_view(['GET','POST','PUT','PATCH','DELETE'])
 def person(request):
     if request.method == 'GET':
